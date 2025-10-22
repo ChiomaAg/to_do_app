@@ -50,6 +50,10 @@ def find_index_by_id(data, task_id):
     return None
 
 
+def next_id(tasks): 
+    return max((task["id"] for task in tasks), default=0) + 1 
+
+
 def save_data():
     with open("tasks.json", "w") as f:
         json.dump(data, f, indent=4)
@@ -61,7 +65,7 @@ if args.add:
     index = len(data)
 
     data_to_save = {
-        "id": index+1,
+        "id": next_id(data),
         "description": task,
         "status": "Todo",
         "createdAt": formatted_datetime,
