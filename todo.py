@@ -20,7 +20,7 @@ group.add_argument(
     "--mark_done", help="Marks a task as done given an ID"
 )
 group.add_argument(
-    "--list", help="List all the tasks on the to-do list", action="store_true"
+    "--list", nargs="?", const="all", choices=["all", "done", "todo", "in_progress"], help="List all the tasks on the to-do list"
 )
 
 # -----------------helpers-------------------------------------
@@ -49,7 +49,7 @@ if args.add:
     task = args.add
     data_to_save = {
         "task": task,
-        "status": ""
+        "status": "Todo"
     }
     data.append(data_to_save)
 
@@ -101,7 +101,25 @@ elif args.mark_done:
         save_data()
 
 elif args.list:
-    for item in data:
-        print(item["task"])
+    filter = args.list
+    if filter == "all":
+        print("Showing all tasks...")
+        for item in data:
+            print(item["task"])
+    elif filter == "done":
+        print("Showing completed tasks...")
+        for item in data:
+            if item["status"] == "Done":
+                print(item["task"])
+    elif filter == "todo":
+        print("Showing todo tasks...")
+        for item in data:
+            if item["status"] == "Todo":
+                print(item["task"])
+    elif filter == "in_progress":
+        print("Showing completed tasks...")
+        for item in data:
+            if item["status"] == "In progress":
+                print(item["task"])
 else:
     print("Nothing to do")
