@@ -19,6 +19,9 @@ group.add_argument(
 group.add_argument(
     "--mark_done", help="Marks a task as done given an ID"
 )
+group.add_argument(
+    "--list", help="List all the tasks on the to-do list", action="store_true"
+)
 
 # -----------------helpers-------------------------------------
 args = parser.parse_args()
@@ -97,5 +100,8 @@ elif args.mark_done:
         data[index]["status"] = "Done"
         save_data()
 
+elif args.list:
+    for item in data:
+        print(item["task"])
 else:
     print("Nothing to do")

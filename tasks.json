@@ -1,6 +1,10 @@
 [
     {
-        "task": "do homework\n",
+        "task": "do homework",
         "status": "Done"
+    },
+    {
+        "task": "sleep",
+        "status": ""
     }
 ]
