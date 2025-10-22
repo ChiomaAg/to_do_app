@@ -1,12 +1,13 @@
 import argparse
 import json
+from datetime import datetime
 
 parser = argparse.ArgumentParser(description="A CLI todo app")
 
 # -----------------------Arguments------------------------------------
 group = parser.add_mutually_exclusive_group()
 group.add_argument(
-    "--add", help="Adds a task to the to-do list")
+    "--add", help="Adds a task and description to the to-do list")
 group.add_argument(
     "--update", nargs=2, help="Update a task using a given ID"
 )
@@ -25,6 +26,9 @@ group.add_argument(
 
 # -----------------helpers-------------------------------------
 args = parser.parse_args()
+current_datetime = datetime.now()
+formatted_datetime = current_datetime.strftime("%Y-%m-%d %H:%M:%S")
+
 try:
     with open("tasks.json", "r") as f:
         data = json.load(f)
@@ -39,6 +43,13 @@ def error_check(index):
         raise ValueError("The first argument should be an integer")
 
 
+def find_index_by_id(data, task_id):
+    for i, task in enumerate(data):
+        if task["id"] == task_id:
+            return i
+    return None
+
+
 def save_data():
     with open("tasks.json", "w") as f:
         json.dump(data, f, indent=4)
@@ -47,35 +58,39 @@ def save_data():
 # ---------------------main logic---------------------------------------------------
 if args.add:
     task = args.add
+    index = len(data)
+
     data_to_save = {
-        "task": task,
-        "status": "Todo"
+        "id": index+1,
+        "description": task,
+        "status": "Todo",
+        "createdAt": formatted_datetime,
+        "updatedAt": formatted_datetime
     }
     data.append(data_to_save)
 
     with open("tasks.json", "w") as f:
         json.dump(data, f, indent=4)
 
-    index = len(data)
-
-    print(f'Task successfully added (ID: {index})')
+    print(f'Task successfully added (ID: {index+1})')
 
 elif args.update:
-    index, task = args.update
-    error_check(index)
-    index = int(index) - 1
-    if index > (len(data)-1):
-        print("No task with that ID")
+    id, task = args.update
+    id = int(id)
+    index = find_index_by_id(data, id)
+    if index is None:
+        print("No task with that ID.")
     else:
-        data[index]["task"] = task
+        data[index]["description"] = task
+        data[index]["updatedAt"] = formatted_datetime
         save_data()
 
 elif args.delete:
-    index = args.delete
-    error_check(index)
-    index = int(index) - 1
-    if index > (len(data)-1):
-        print("No task with that ID")
+    id = args.delete
+    id = int(id)
+    index = find_index_by_id(data, id)
+    if index is None:
+        print("No task with that ID.")
     else:
         del data[index]
         save_data()
@@ -105,21 +120,21 @@ elif args.list:
     if filter == "all":
         print("Showing all tasks...")
         for item in data:
-            print(item["task"])
+            print(item["description"])
     elif filter == "done":
         print("Showing completed tasks...")
         for item in data:
             if item["status"] == "Done":
-                print(item["task"])
+                print(item["description"])
     elif filter == "todo":
         print("Showing todo tasks...")
         for item in data:
             if item["status"] == "Todo":
-                print(item["task"])
+                print(item["description"])
     elif filter == "in_progress":
         print("Showing completed tasks...")
         for item in data:
             if item["status"] == "In progress":
-                print(item["task"])
+                print(item["description"])
 else:
     print("Nothing to do")
