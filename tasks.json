@@ -1,5 +1,6 @@
 [
-    "Make a cookie",
-    "Make a cookie",
-    "Make a chair"
+    {
+        "task": "do homework\n",
+        "status": "Done"
+    }
 ]

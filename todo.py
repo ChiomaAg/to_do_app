@@ -13,6 +13,12 @@ group.add_argument(
 group.add_argument(
     '--delete', help="Deletes a task using a given ID"
 )
+group.add_argument(
+    "--mark_in_progress", help="Marks a task in progress given an ID"
+)
+group.add_argument(
+    "--mark_done", help="Marks a task as done given an ID"
+)
 
 # -----------------helpers-------------------------------------
 args = parser.parse_args()
@@ -34,10 +40,15 @@ def save_data():
     with open("tasks.json", "w") as f:
         json.dump(data, f, indent=4)
 
-#---------------------main logic---------------------------------------------------
+
+# ---------------------main logic---------------------------------------------------
 if args.add:
     task = args.add
-    data.append(task)
+    data_to_save = {
+        "task": task,
+        "status": ""
+    }
+    data.append(data_to_save)
 
     with open("tasks.json", "w") as f:
         json.dump(data, f, indent=4)
@@ -53,7 +64,7 @@ elif args.update:
     if index > (len(data)-1):
         print("No task with that ID")
     else:
-        data[index] = task
+        data[index]["task"] = task
         save_data()
 
 elif args.delete:
@@ -66,6 +77,25 @@ elif args.delete:
         del data[index]
         save_data()
 
+elif args.mark_in_progress:
+    index = args.mark_in_progress
+    error_check(index)
+    index = int(index) - 1
+    if index > (len(data)-1):
+        print("No task with that ID")
+    else:
+        data[index]["status"] = "In progress"
+        save_data()
+
+elif args.mark_done:
+    index = args.mark_done
+    error_check(index)
+    index = int(index) - 1
+    if index > (len(data)-1):
+        print("No task with that ID")
+    else:
+        data[index]["status"] = "Done"
+        save_data()
 
 else:
     print("Nothing to do")
